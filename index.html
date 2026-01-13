@@ -1,0 +1,659 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-6">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0">
+    <title>Sistem Manajemen Stok Barang</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content-wrapper {
+            padding: 25px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .filter-section, .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filter-section select, .filter-section input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #4b6cb7;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5795;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            width: 250px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-minuman {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .badge-suplemen {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-obat {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stock-low {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .stock-ok {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .action-buttons-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .form-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.1);
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .footer-info {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .total-items {
+            font-weight: 600;
+            color: #4b6cb7;
+            background-color: #f0f2f5;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-boxes"></i> Sistem Manajemen Stok Barang</h1>
+            <p>Kelola inventaris barang dengan mudah dan efisien</p>
+        </header>
+        
+        <div class="content-wrapper">
+            <div class="controls">
+                <div class="filter-section">
+                    <select id="categoryFilter">
+                        <option value="all">Semua Kategori</option>
+                        <option value="Minuman">Minuman</option>
+                        <option value="Suplemen">Suplemen</option>
+                        <option value="Obat-obatan">Obat-obatan</option>
+                    </select>
+                    
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Cari nama barang atau supplier...">
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <span class="total-items">Total Barang: <span id="totalItems">10</span></span>
+                    <button class="btn btn-primary" id="addItemBtn">
+                        <i class="fas fa-plus"></i> Tambah Barang Baru
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Kode Barang</th>
+                            <th>Kategori</th>
+                            <th>Nama Barang</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th>Supplier</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="footer-info">
+                <p>Sistem ini membantu Anda mengelola stok barang dengan lebih efisien. Stok yang kurang dari 15 akan ditampilkan dengan warna merah.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Form untuk Tambah/Edit Barang -->
+    <div class="form-modal" id="itemFormModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader">
+                Tambah Barang Baru
+            </div>
+            <div class="modal-body">
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label for="itemCode">Kode Barang</label>
+                        <input type="text" id="itemCode" name="itemCode" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Kategori</label>
+                        <select id="category" name="category" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Minuman">Minuman</option>
+                            <option value="Suplemen">Suplemen</option>
+                            <option value="Obat-obatan">Obat-obatan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemName">Nama Barang</label>
+                        <input type="text" id="itemName" name="itemName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price">Harga (Rp)</label>
+                        <input type="number" id="price" name="price" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stock">Stok</label>
+                        <input type="number" id="stock" name="stock" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier">Supplier</label>
+                        <input type="text" id="supplier" name="supplier" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="cancelBtn">Batal</button>
+                <button class="btn btn-success" id="saveBtn">Simpan Barang</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data awal stok barang
+        let inventoryItems = [
+            { code: "BRG-11", category: "Minuman", name: "Teh Sosro Kotak", price: 6000, stock: 10, supplier: "PT. Maju" },
+            { code: "BRG-12", category: "Minuman", name: "Teh Pucuk", price: 5000, stock: 12, supplier: "PT. Maju" },
+            { code: "BRG-13", category: "Minuman", name: "Teh Java", price: 4000, stock: 15, supplier: "PT Jaya" },
+            { code: "BRG-21", category: "Suplemen", name: "U cee 1000", price: 7000, stock: 20, supplier: "PT Jaya" },
+            { code: "BRG-22", category: "Suplemen", name: "Kratindeng 200", price: 8000, stock: 25, supplier: "Kasih Farma" },
+            { code: "BRG-23", category: "Suplemen", name: "Hemaviton 200", price: 7500, stock: 35, supplier: "Kasih Farma" },
+            { code: "BRG-31", category: "Obat-obatan", name: "Sanmol Syrup", price: 12000, stock: 40, supplier: "Aura Farma" },
+            { code: "BRG-32", category: "Obat-obatan", name: "Paramex", price: 4000, stock: 40, supplier: "Aura Farma" },
+            { code: "BRG-33", category: "Obat-obatan", name: "Antimo", price: 6000, stock: 60, supplier: "PT. Naninu" },
+            { code: "BRG-34", category: "Obat-obatan", name: "New Diatab", price: 4500, stock: 60, supplier: "PT. Naninu" }
+        ];
+
+        // DOM Elements
+        const tableBody = document.getElementById('tableBody');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const searchInput = document.getElementById('searchInput');
+        const totalItemsSpan = document.getElementById('totalItems');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const itemFormModal = document.getElementById('itemFormModal');
+        const modalHeader = document.getElementById('modalHeader');
+        const itemForm = document.getElementById('itemForm');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const itemCodeInput = document.getElementById('itemCode');
+        const categorySelect = document.getElementById('category');
+        const itemNameInput = document.getElementById('itemName');
+        const priceInput = document.getElementById('price');
+        const stockInput = document.getElementById('stock');
+        const supplierInput = document.getElementById('supplier');
+
+        // Variabel untuk mode edit
+        let isEditMode = false;
+        let currentEditIndex = -1;
+
+        // Fungsi untuk merender tabel
+        function renderTable(items = inventoryItems) {
+            tableBody.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                // Tentukan kelas badge berdasarkan kategori
+                let badgeClass = '';
+                if (item.category === 'Minuman') badgeClass = 'badge-minuman';
+                else if (item.category === 'Suplemen') badgeClass = 'badge-suplemen';
+                else if (item.category === 'Obat-obatan') badgeClass = 'badge-obat';
+                
+                // Tentukan kelas stok berdasarkan jumlah
+                const stockClass = item.stock < 15 ? 'stock-low' : 'stock-ok';
+                
+                row.innerHTML = `
+                    <td>${item.code}</td>
+                    <td><span class="badge ${badgeClass}">${item.category}</span></td>
+                    <td>${item.name}</td>
+                    <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+                    <td class="${stockClass}">${item.stock}</td>
+                    <td>${item.supplier}</td>
+                    <td class="action-buttons-cell">
+                        <button class="action-btn edit-btn" onclick="editItem(${index})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteItem(${index})">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Update total items
+            totalItemsSpan.textContent = items.length;
+        }
+
+        // Fungsi untuk filter berdasarkan kategori
+        function filterByCategory() {
+            const selectedCategory = categoryFilter.value;
+            
+            if (selectedCategory === 'all') {
+                renderTable();
+                return;
+            }
+            
+            const filteredItems = inventoryItems.filter(item => item.category === selectedCategory);
+            renderTable(filteredItems);
+        }
+
+        // Fungsi untuk pencarian
+        function searchItems() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredItems = inventoryItems.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) || 
+                item.supplier.toLowerCase().includes(searchTerm) ||
+                item.code.toLowerCase().includes(searchTerm)
+            );
+            
+            renderTable(filteredItems);
+        }
+
+        // Fungsi untuk menambah barang baru
+        function addItem() {
+            isEditMode = false;
+            currentEditIndex = -1;
+            
+            // Reset form
+            itemForm.reset();
+            modalHeader.textContent = "Tambah Barang Baru";
+            saveBtn.textContent = "Simpan Barang";
+            
+            // Tampilkan modal
+            itemFormModal.style.display = "flex";
+        }
+
+        // Fungsi untuk mengedit barang
+        function editItem(index) {
+            isEditMode = true;
+            currentEditIndex = index;
+            
+            // Isi form dengan data barang yang dipilih
+            const item = inventoryItems[index];
+            itemCodeInput.value = item.code;
+            categorySelect.value = item.category;
+            itemNameInput.value = item.name;
+            priceInput.value = item.price;
+            stockInput.value = item.stock;
+            supplierInput.value = item.supplier;
+            
+            modalHeader.textContent = "Edit Barang";
+            saveBtn.textContent = "Update Barang";
+            
+            // Tampilkan modal
+            itemFormModal.style.display = "flex";
+        }
+
+        // Fungsi untuk menghapus barang
+        function deleteItem(index) {
+            if (confirm(`Apakah Anda yakin ingin menghapus barang ${inventoryItems[index].name}?`)) {
+                inventoryItems.splice(index, 1);
+                renderTable();
+                
+                // Jika sedang dalam mode filter/pencarian, update tampilan
+                filterByCategory();
+            }
+        }
+
+        // Fungsi untuk menyimpan barang (tambah atau edit)
+        function saveItem() {
+            // Validasi form
+            if (!itemCodeInput.value || !itemNameInput.value || !priceInput.value || !stockInput.value || !supplierInput.value || !categorySelect.value) {
+                alert("Harap lengkapi semua field!");
+                return;
+            }
+            
+            // Buat objek barang baru
+            const newItem = {
+                code: itemCodeInput.value,
+                category: categorySelect.value,
+                name: itemNameInput.value,
+                price: parseInt(priceInput.value),
+                stock: parseInt(stockInput.value),
+                supplier: supplierInput.value
+            };
+            
+            if (isEditMode) {
+                // Update barang yang sudah ada
+                inventoryItems[currentEditIndex] = newItem;
+            } else {
+                // Tambah barang baru
+                // Cek apakah kode barang sudah ada
+                const existingItem = inventoryItems.find(item => item.code === newItem.code);
+                if (existingItem) {
+                    alert("Kode barang sudah ada. Gunakan kode yang berbeda.");
+                    return;
+                }
+                
+                inventoryItems.push(newItem);
+            }
+            
+            // Sembunyikan modal
+            itemFormModal.style.display = "none";
+            
+            // Render ulang tabel
+            renderTable();
+            
+            // Update filter/pencarian jika sedang aktif
+            filterByCategory();
+        }
+
+        // Event Listeners
+        categoryFilter.addEventListener('change', filterByCategory);
+        searchInput.addEventListener('input', searchItems);
+        addItemBtn.addEventListener('click', addItem);
+        cancelBtn.addEventListener('click', () => {
+            itemFormModal.style.display = "none";
+        });
+        
+        saveBtn.addEventListener('click', saveItem);
+        
+        // Tutup modal jika klik di luar konten modal
+        itemFormModal.addEventListener('click', (e) => {
+            if (e.target === itemFormModal) {
+                itemFormModal.style.display = "none";
+            }
+        });
+
+        // Render tabel saat pertama kali dimuat
+        renderTable();
+    </script>
+</body>
+</html>
